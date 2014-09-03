@@ -575,7 +575,7 @@ rpm: $(TOPDIR)/tmp/systemimager-$(VERSION).tar.bz2 $(TOPDIR)/systemimager.spec
 # ?? -BEF-  If so, we should add libpam-dev to UBUNTU_PRECISE_BUILD_DEPS
 # in initrd_source/make.d/util-linux.rul.
 #
-UBUNTU_PRECISE_BUILD_DEPS += dos2unix docbook-utils libncurses-dev
+UBUNTU_PRECISE_BUILD_DEPS += dos2unix docbook-utils libncurses-dev bc cramfsprogs libdevmapper-dev libpopt-dev texinfo tofrodos quilt pkg-config libglib2.0-dev gperf docbook-to-man
 .PHONY: deb debs
 debs: deb
 deb: $(TOPDIR)/tmp/systemimager-$(VERSION).tar.bz2

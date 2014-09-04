@@ -7,9 +7,13 @@
 #
 # 2013.01.29 Olivier Lahaye
 # * Upgrade to v2.88dsf-13.10ubuntu14
+#
+# 2014.09.03 Steve Traugott
+# * Downgrade to v2.88dsf-13.10ubuntu11 -- 13.10ubuntu14 is no longer 
+#   in the ubuntu repository  
 
 SYSVINIT_VERSION     	= 2.88dsf
-SYSVINIT_DEBIAN_VERSION = 13.10ubuntu15
+SYSVINIT_DEBIAN_VERSION = 13.10ubuntu11
 SYSVINIT_TARBALL     	= sysvinit_$(SYSVINIT_VERSION).orig.tar.gz
 SYSVINIT_URL         	= http://us.archive.ubuntu.com/ubuntu/pool/main/s/sysvinit/
 #SYSVINIT_URL         	= http://download.systemimager.org/pub/sysvinit/

@@ -174,13 +174,14 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 	# Copy over the standard libs. -BEF-
 	test -z "$(echo /lib/ld*)" || cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
 	test ! -d /lib64 || cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib64
+	test -f /lib/x86_64-linux-gnu/ld* && cp -a /lib/x86_64-linux-gnu/ld*  $(INITRD_BUILD_DIR)/lib
 	# Remove useless stuffs (man, translation, includes, ...)
 	( cd $(INITRD_BUILD_DIR) && /bin/rm -rf share usr/share usr/include lib/*.a )
 	# Explicitly include more w/mklibs -L.  -dawild-
 	echo "Copying /lib*/libnss* to $(INITRD_BUILD_DIR)/lib*"
 ifeq ($(ARCH),x86_64)
 	( cd $(INITRD_BUILD_DIR) && \
-		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib64:/usr/lib64:/lib:/usr/lib -v -d . ./*bin/* )
+		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib64:/usr/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu -v -d . ./*bin/* )
 	# copy libnss files as they are not automatically included
 	#cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
 	for lib in /lib64/libnss* ; do \

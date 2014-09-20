@@ -5,12 +5,12 @@
 #
 # This is run first except when booting in single-user mode.
 #
-tty1::sysinit:/etc/init.d/rcS
+::sysinit:/etc/init.d/rcS
 
 # /bin/sh invocations on selected ttys
 #
 # Start an "askfirst" shell on the console (whatever that may be)
-::askfirst:-/bin/sh
+#::askfirst:-/bin/sh
 
 # Start an "askfirst" shell on /dev/tty2-6
 #tty2::askfirst:-/bin/sh

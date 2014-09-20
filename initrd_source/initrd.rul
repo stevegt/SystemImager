@@ -105,7 +105,9 @@ $(INITRD_BUILD_DIR).skel:	$(INITRD_DIR)/initrd.rul
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/lib
 	
 	# If build OS has /lib64, link it to /lib
-	test ! -d /lib64 || ( cd $(INITRD_BUILD_DIR) && ln -s lib lib64 )
+	# (this is a -e on purpose -- some distros have a symlink for
+	# /lib64, do -d won't work here)
+	test ! -e /lib64 || ( cd $(INITRD_BUILD_DIR) && ln -s lib lib64 )
 	
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/proc
 	mkdir -p -m 0755 $(INITRD_BUILD_DIR)/root
@@ -172,16 +174,20 @@ $(INITRD_BUILD_DIR).build:  $(INITRD_BUILD_DIR).prep		\
 								$(ZLIB_DIR).install
 
 	# Copy over the standard libs. -BEF-
-	test -z "$(echo /lib/ld*)" || cp -a /lib/ld*   $(INITRD_BUILD_DIR)/lib
-	test ! -d /lib64 || cp -a /lib64/ld* $(INITRD_BUILD_DIR)/lib64
-	test -f /lib/x86_64-linux-gnu/ld* && cp -a /lib/x86_64-linux-gnu/ld*  $(INITRD_BUILD_DIR)/lib
+	#
+	# first, get the loader; we already symlinked lib to lib64 above,
+	# so just dump everything into lib; need a 'for' loop here instead
+	# of a simple copy; e.g. 'cp -a /lib/*/ld* ...' by itself will fail if 
+	# the source's /lib64 is a symlink to /lib
+	for f in /lib*/ld*; do cp -a $$f $(INITRD_BUILD_DIR)/lib; done
+	#
 	# Remove useless stuffs (man, translation, includes, ...)
 	( cd $(INITRD_BUILD_DIR) && /bin/rm -rf share usr/share usr/include lib/*.a )
 	# Explicitly include more w/mklibs -L.  -dawild-
 	echo "Copying /lib*/libnss* to $(INITRD_BUILD_DIR)/lib*"
 ifeq ($(ARCH),x86_64)
 	( cd $(INITRD_BUILD_DIR) && \
-		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib64:/usr/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu -v -d . ./*bin/* )
+		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib64:/usr/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu -v -d $(INITRD_BUILD_DIR)/lib ./*bin/* )
 	# copy libnss files as they are not automatically included
 	#cp -a /lib64/libnss* $(INITRD_BUILD_DIR)/lib64
 	for lib in /lib64/libnss* ; do \
@@ -192,7 +198,7 @@ ifeq ($(ARCH),x86_64)
 	done
 else
 	( cd $(INITRD_BUILD_DIR) && \
-		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib:/usr/lib -v -d . ./*bin/* )
+		$(INITRD_DIR)/mklibs.bef -L $(INITRD_SRC_DIR)/$(E2FSPROGS_DIR)/lib:/lib:/usr/lib -v -d $(INITRD_BUILD_DIR)/lib ./*bin/* )
 	# copy libnss files as they are not automatically included
 	#cp -a /lib/libnss* $(INITRD_BUILD_DIR)/lib
 	for lib in /lib/libnss* ; do \
